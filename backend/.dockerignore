@@ -1,0 +1,10 @@
+# Build context is backend/: only what the image needs.
+.venv
+**/__pycache__
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.env
+*.db
+tests
+loadtest

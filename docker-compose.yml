@@ -2,13 +2,15 @@
 #   API       http://localhost:8000 (docs at /docs)
 #   Worker    http://localhost:8081/healthz
 #   Kafka UI  http://localhost:8080
+#   Dashboard http://localhost:5173 (optional demo UI; Vite dev server proxying to the API)
 x-app: &app
-  build: .
+  build: ./backend
   environment: &app-env
     DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/transactions
     KAFKA_BOOTSTRAP_SERVERS: kafka:19092
     PROCESSING_DELAY_SECONDS: ${PROCESSING_DELAY_SECONDS:-30}
     WEBHOOK_SECRET: ${WEBHOOK_SECRET:-}
+    ADMIN_API_KEY: ${ADMIN_API_KEY:-}   # unset locally: the dashboard's admin endpoints are open
   restart: unless-stopped
 
 services:
@@ -79,3 +81,17 @@ services:
     ports: ["8081:8081"]
     depends_on:
       init: { condition: service_completed_successfully }
+
+  # Optional demo dashboard. Same-origin through Vite's proxy, so no CORS setup is needed locally.
+  dashboard:
+    image: node:22-slim
+    working_dir: /app
+    command: ["sh", "-c", "npm ci --no-audit --no-fund && npm run dev -- --host 0.0.0.0"]
+    environment:
+      VITE_API_TARGET: http://api:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules   # keep container-installed deps separate from the host's
+    ports: ["5173:5173"]
+    depends_on:
+      - api
