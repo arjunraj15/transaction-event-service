@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     environment: str = "local"
     log_level: str = "INFO"
 
-    # Accepts the raw URL from Neon/Railway (postgres://...?sslmode=require); normalized in db.engine.
+    # Accepts the raw URL from Neon/Render (postgres://...?sslmode=require); normalized in db.engine.
     database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/transactions"
     db_pool_size: int = 5
     db_max_overflow: int = 5

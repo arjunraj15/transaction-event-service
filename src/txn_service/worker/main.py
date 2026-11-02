@@ -1,6 +1,6 @@
 """Consumer service entrypoint: `python -m txn_service.worker.main`.
 
-Also serves /healthz and /metrics on WORKER_HTTP_PORT (or PORT, as set by Railway) for platform health checks.
+Also serves /healthz and /metrics on WORKER_HTTP_PORT (or PORT, if the platform sets one).
 """
 
 import asyncio

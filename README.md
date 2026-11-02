@@ -2,9 +2,9 @@
 
 A service that receives transaction webhooks from payment processors (e.g. RazorPay), **acknowledges them in milliseconds**, and **processes them reliably in the background**. Repeated webhooks for the same transaction are processed **exactly once**.
 
-**Live API:** `https://<your-api>.up.railway.app` · interactive docs at `/docs`
+**Live API:** `https://txn-api.onrender.com` · interactive docs at `/docs`
 
-**Stack:** Python 3.12 · FastAPI · Kafka (Confluent Cloud) · PostgreSQL (Neon) · SQLAlchemy 2 + Alembic · Docker · Railway · GitHub Actions
+**Stack:** Python 3.12 · FastAPI · Kafka (Confluent Cloud) · PostgreSQL (Neon) · SQLAlchemy 2 + Alembic · Docker · Render · GitHub Actions
 
 ---
 
@@ -107,29 +107,25 @@ uv run ruff check . && uv run ruff format --check . && uv run mypy   # lint, for
 
 CI (GitHub Actions) runs lint, type checks, unit and integration tests, and a Docker build on every push and PR.
 
-## Deployment (Confluent Cloud + Neon + Railway)
+## Deployment (Confluent Cloud + Neon + Render)
 
 1. **Kafka (Confluent Cloud).** Create a *Basic* cluster and an API key, then create the topics once:
    ```bash
-   KAFKA_BOOTSTRAP_SERVERS=<pkc-…:9092> KAFKA_SECURITY_PROTOCOL=SASL_SSL \
-   KAFKA_API_KEY=<key> KAFKA_API_SECRET=<secret> KAFKA_TOPIC_REPLICATION_FACTOR=3 \
-   uv run python scripts/create_topics.py
+   KAFKA_BOOTSTRAP_SERVERS=<bootstrap:9092> KAFKA_SECURITY_PROTOCOL=SASL_SSL    KAFKA_API_KEY=<key> KAFKA_API_SECRET=<secret> KAFKA_TOPIC_REPLICATION_FACTOR=3    uv run python scripts/create_topics.py
    ```
-2. **PostgreSQL (Neon).** Create a project and copy its connection string. The `postgresql://…?sslmode=require` form can be used as-is.
-3. **Railway.** Create two services from this GitHub repo:
-   - **api**: config file `deploy/railway/api.json`. This runs migrations as a pre-deploy step, health-checks `/health/ready`, and needs a public domain.
-   - **worker**: config file `deploy/railway/worker.json`. Start command `python -m txn_service.worker.main`, health check `/healthz`.
-   - Set the same variables on both services (shared variables work well):
+2. **PostgreSQL (Neon).** Create a project and copy its **direct** (non-pooled) connection string. The `postgresql://…?sslmode=require` form can be used as-is. The app keeps its own connection pool, and PgBouncer's transaction pooling doesn't work well with asyncpg prepared statements.
+3. **Render.** Click *New → Blueprint*, select this repo, and Render reads [`render.yaml`](render.yaml):
+   - **txn-api** (web service, Starter): builds the Dockerfile, runs `alembic upgrade head` as a pre-deploy step, and health-checks `/health/ready`.
+   - **txn-worker** (background worker, Starter): same image, started with `python -m txn_service.worker.main`.
+   - Non-secret settings (bootstrap server, SASL_SSL, replication factor 3, the 30 s delay) live in the `txn-shared` environment group. Render prompts for the secrets, which are marked `sync: false` and never stored in git:
 
-   | Variable | Value |
-   |---|---|
-   | `DATABASE_URL` | Neon connection string |
-   | `KAFKA_BOOTSTRAP_SERVERS` | Confluent bootstrap server |
-   | `KAFKA_SECURITY_PROTOCOL` | `SASL_SSL` |
-   | `KAFKA_API_KEY` / `KAFKA_API_SECRET` | Confluent API key and secret |
-   | `KAFKA_TOPIC_REPLICATION_FACTOR` | `3` |
-   | `WEBHOOK_SECRET` | *(optional)* enables signature verification |
-   | `ENVIRONMENT` | `production` |
+   | Variable | Services | Value |
+   |---|---|---|
+   | `DATABASE_URL` | api, worker | Neon connection string |
+   | `KAFKA_API_KEY` / `KAFKA_API_SECRET` | api, worker | Confluent API key and secret |
+   | `WEBHOOK_SECRET` | api | *(optional)* enables signature verification |
+
+   Both services run on always-on Starter instances in Singapore, so there are no cold starts that could break the 500 ms SLA.
 
 4. Smoke test: `curl https://<api-domain>/health/ready`, then run the scenarios above.
 
@@ -207,5 +203,5 @@ alembic/          migrations
 tests/unit        API, schemas, processor, consumer (no infrastructure)
 tests/integration end-to-end with real Postgres + Kafka (Testcontainers)
 loadtest/         k6 script
-deploy/railway/   per-service Railway config
+render.yaml       Render Blueprint (api + worker services)
 ```

@@ -1,0 +1,57 @@
+# Render Blueprint: one image, two always-on services.
+# Secrets are `sync: false`: Render asks for their values when the Blueprint is created; they never live in git.
+services:
+  - type: web
+    name: txn-api
+    runtime: docker
+    plan: starter            # always on: no cold starts, so the 500 ms webhook SLA holds
+    region: singapore        # near Neon (Singapore) and Confluent (Mumbai)
+    dockerfilePath: ./Dockerfile
+    preDeployCommand: alembic upgrade head
+    healthCheckPath: /health/ready
+    autoDeploy: true
+    envVars:
+      - fromGroup: txn-shared
+      - key: WEB_CONCURRENCY
+        value: "2"
+      - key: DATABASE_URL
+        sync: false
+      - key: KAFKA_API_KEY
+        sync: false
+      - key: KAFKA_API_SECRET
+        sync: false
+      - key: WEBHOOK_SECRET   # optional: leave empty to disable signature verification
+        sync: false
+
+  - type: worker
+    name: txn-worker
+    runtime: docker
+    plan: starter
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    dockerCommand: python -m txn_service.worker.main
+    autoDeploy: true
+    envVars:
+      - fromGroup: txn-shared
+      - key: DATABASE_URL
+        sync: false
+      - key: KAFKA_API_KEY
+        sync: false
+      - key: KAFKA_API_SECRET
+        sync: false
+
+envVarGroups:
+  - name: txn-shared
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: KAFKA_BOOTSTRAP_SERVERS
+        value: lkc-pg61912.ap-south-1.aws.public.confluent.cloud:9092
+      - key: KAFKA_SECURITY_PROTOCOL
+        value: SASL_SSL
+      - key: KAFKA_SASL_MECHANISM
+        value: PLAIN
+      - key: KAFKA_TOPIC_REPLICATION_FACTOR
+        value: "3"
+      - key: PROCESSING_DELAY_SECONDS
+        value: "30"
