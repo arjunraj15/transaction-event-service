@@ -5,7 +5,7 @@ services:
     name: txn-api
     runtime: docker
     plan: starter            # always on: no cold starts, so the 500 ms webhook SLA holds
-    region: singapore        # near Neon (Singapore) and Confluent (Mumbai)
+    region: singapore        # same AWS region as Neon and Confluent (ap-southeast-1)
     dockerfilePath: ./Dockerfile
     preDeployCommand: alembic upgrade head
     healthCheckPath: /health/ready
@@ -46,7 +46,7 @@ envVarGroups:
       - key: ENVIRONMENT
         value: production
       - key: KAFKA_BOOTSTRAP_SERVERS
-        value: lkc-pg61912.ap-south-1.aws.public.confluent.cloud:9092
+        value: pkc-312o0.ap-southeast-1.aws.confluent.cloud:9092
       - key: KAFKA_SECURITY_PROTOCOL
         value: SASL_SSL
       - key: KAFKA_SASL_MECHANISM

@@ -40,7 +40,13 @@ def create_app(
                 producer = create_producer(settings)
                 await producer.start()
                 stack.push_async_callback(producer.stop)  # flushes in-flight messages on shutdown
-                app.state.publisher = TransactionPublisher(producer, settings)
+                kafka_publisher = TransactionPublisher(producer, settings)
+                try:
+                    await kafka_publisher.warm_up()
+                    log.info("kafka_producer_warmed_up")
+                except Exception as exc:
+                    log.warning("kafka_warm_up_failed", error=repr(exc))
+                app.state.publisher = kafka_publisher
             else:
                 app.state.publisher = publisher
             log.info("api_started", environment=settings.environment)

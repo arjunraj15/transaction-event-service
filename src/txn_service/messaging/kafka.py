@@ -2,7 +2,7 @@ import asyncio
 from datetime import UTC, datetime
 from typing import Any
 
-from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
+from aiokafka import AIOKafkaConsumer, AIOKafkaProducer, TopicPartition
 from aiokafka.helpers import create_ssl_context
 
 from txn_service.config import Settings
@@ -87,6 +87,21 @@ class TransactionPublisher:
                 value=event.model_dump_json().encode(),
                 key=event.transaction_id.encode(),  # same id -> same partition -> ordered handling
             )
+
+    async def warm_up(self) -> None:
+        """Pay the cold-start cost before taking traffic, not inside the first webhooks' latency budget.
+
+        The producer otherwise fetches topic metadata and opens a TLS+SASL connection to each partition
+        leader lazily on the first send, which alone can exceed the 500 ms SLA. Best effort: failures
+        are logged by the caller and the first sends simply warm up instead.
+        """
+        topic = self._settings.kafka_topic_transactions
+        async with asyncio.timeout(15):
+            partitions = await self._producer.partitions_for(topic)
+            client = self._producer.client
+            # Only this topic's partition leaders: a shared cluster can have many more brokers.
+            leaders = {client.cluster.leader_for_partition(TopicPartition(topic, p)) for p in partitions}
+            await asyncio.gather(*(client.ready(node_id) for node_id in leaders if node_id is not None))
 
     async def is_ready(self) -> bool:
         try:
