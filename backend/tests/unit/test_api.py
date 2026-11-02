@@ -215,11 +215,11 @@ def test_cors_allows_only_the_configured_dashboard_origin(
 ) -> None:
     preflight = {"Access-Control-Request-Method": "GET", "Access-Control-Request-Headers": "X-Admin-Key"}
     # A bare host (as Render's fromService provides) is normalized to https://host
-    for client in make_client(publisher, repo, cors_allowed_origins="txn-dashboard.onrender.com"):
+    for client in make_client(publisher, repo, cors_allowed_origins="dashboard.example.com"):
         ok = client.options(
-            "/v1/transactions", headers={"Origin": "https://txn-dashboard.onrender.com", **preflight}
+            "/v1/transactions", headers={"Origin": "https://dashboard.example.com", **preflight}
         )
-        assert ok.headers["access-control-allow-origin"] == "https://txn-dashboard.onrender.com"
+        assert ok.headers["access-control-allow-origin"] == "https://dashboard.example.com"
         assert "x-admin-key" in ok.headers["access-control-allow-headers"].lower()
         evil = client.options("/v1/transactions", headers={"Origin": "https://evil.example", **preflight})
         assert "access-control-allow-origin" not in evil.headers
@@ -227,5 +227,5 @@ def test_cors_allows_only_the_configured_dashboard_origin(
 
 def test_cors_is_off_when_no_origin_is_configured(publisher: FakePublisher, repo: FakeRepository) -> None:
     for client in make_client(publisher, repo):
-        response = client.get("/", headers={"Origin": "https://txn-dashboard.onrender.com"})
+        response = client.get("/", headers={"Origin": "https://dashboard.example.com"})
         assert "access-control-allow-origin" not in response.headers

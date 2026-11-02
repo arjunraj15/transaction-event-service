@@ -18,6 +18,8 @@ services:
         value: "2"
       - key: DATABASE_URL
         sync: false
+      - key: KAFKA_BOOTSTRAP_SERVERS  # cluster endpoint: set in Render, not kept in the repo
+        sync: false
       - key: KAFKA_API_KEY
         sync: false
       - key: KAFKA_API_SECRET
@@ -44,6 +46,8 @@ services:
     envVars:
       - fromGroup: txn-shared
       - key: DATABASE_URL
+        sync: false
+      - key: KAFKA_BOOTSTRAP_SERVERS
         sync: false
       - key: KAFKA_API_KEY
         sync: false
@@ -89,8 +93,6 @@ envVarGroups:
     envVars:
       - key: ENVIRONMENT
         value: production
-      - key: KAFKA_BOOTSTRAP_SERVERS
-        value: pkc-312o0.ap-southeast-1.aws.confluent.cloud:9092
       - key: KAFKA_SECURITY_PROTOCOL
         value: SASL_SSL
       - key: KAFKA_SASL_MECHANISM

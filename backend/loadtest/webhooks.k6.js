@@ -1,5 +1,5 @@
 // Load test for the webhook endpoint: unique transactions plus a share of duplicate retries.
-//   k6 run -e BASE_URL=https://txn-api.onrender.com loadtest/webhooks.k6.js
+//   k6 run -e BASE_URL=<your-api-url> backend/loadtest/webhooks.k6.js
 import http from "k6/http";
 import { check } from "k6";
 import { Counter } from "k6/metrics";

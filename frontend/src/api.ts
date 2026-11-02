@@ -2,7 +2,7 @@ import type { Meta, Readiness, RequestResult, Transaction, WebhookPayload } from
 
 // The dashboard is its own static site: in production VITE_API_BASE is the API's URL (CORS allow-listed).
 // In development it is empty and Vite proxies the calls to the API (same origin).
-// Render's `fromService` provides a bare host (txn-api-xxxx.onrender.com), so default the scheme to https.
+// Render's `fromService` provides a bare host (e.g. api.example.com), so default the scheme to https.
 const rawBase: string = (import.meta.env.VITE_API_BASE ?? "").trim().replace(/\/$/, "");
 export const API_BASE: string = rawBase && !rawBase.includes("://") ? `https://${rawBase}` : rawBase;
 export const apiUrl = (path: string): string => `${API_BASE}${path}`;
