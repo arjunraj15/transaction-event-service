@@ -69,6 +69,9 @@ services:
       - path: /assets/*       # content-hashed file names: safe to cache forever
         name: Cache-Control
         value: public, max-age=31536000, immutable
+      - path: /               # the app shell (served for / and SPA deep links): never cache at the edge,
+        name: Cache-Control   # so a new deploy is visible immediately
+        value: no-cache
       - path: /index.html
         name: Cache-Control
         value: no-cache
