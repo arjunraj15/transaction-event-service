@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     # Required in the X-Admin-Key header for the dashboard's admin endpoints when set (always in prod).
     admin_api_key: SecretStr | None = None
     # Comma-separated browser origins allowed to call the API, e.g. the dashboard's URL. A bare host
-    # (as Render's `fromService` provides) is treated as https://<host>.
+    # is treated as https://<host>.
     cors_allowed_origins: str = ""
 
     @property

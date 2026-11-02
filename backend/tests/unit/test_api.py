@@ -214,7 +214,7 @@ def test_cors_allows_only_the_configured_dashboard_origin(
     publisher: FakePublisher, repo: FakeRepository
 ) -> None:
     preflight = {"Access-Control-Request-Method": "GET", "Access-Control-Request-Headers": "X-Admin-Key"}
-    # A bare host (as Render's fromService provides) is normalized to https://host
+    # A bare host is normalized to https://host
     for client in make_client(publisher, repo, cors_allowed_origins="dashboard.example.com"):
         ok = client.options(
             "/v1/transactions", headers={"Origin": "https://dashboard.example.com", **preflight}

@@ -28,11 +28,8 @@ services:
         sync: false
       - key: ADMIN_API_KEY    # protects the dashboard's admin endpoints; read it in the Render dashboard
         generateValue: true
-      - key: CORS_ALLOWED_ORIGINS  # only the dashboard's origin may call the API from a browser
-        fromService:
-          type: web
-          name: txn-dashboard
-          property: host
+      - key: CORS_ALLOWED_ORIGINS  # the dashboard's public URL (https://...): set in Render, not kept in the repo
+        sync: false
 
   - type: worker
     name: txn-worker
@@ -62,11 +59,8 @@ services:
     staticPublishPath: dist
     pullRequestPreviewsEnabled: false
     envVars:
-      - key: VITE_API_BASE    # baked in at build time; a bare host is treated as https://<host>
-        fromService:
-          type: web
-          name: txn-api
-          property: host
+      - key: VITE_API_BASE    # the API's public URL (https://...), baked in at build time: set in Render
+        sync: false
     routes:
       - type: rewrite         # single-page app: unknown paths serve index.html
         source: /*
