@@ -1,7 +1,7 @@
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import SecretStr
+from pydantic import SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -40,6 +40,14 @@ class Settings(BaseSettings):
     webhook_signature_header: str = "X-Razorpay-Signature"
 
     worker_http_port: int = 8081
+
+    @field_validator("kafka_api_key", "kafka_api_secret", "webhook_secret", mode="before")
+    @classmethod
+    def _blank_means_unset(cls, value: object) -> object:
+        # Platforms (e.g. Render) set optional variables left blank to "", which must not count as configured.
+        if isinstance(value, str) and not value.strip():
+            return None
+        return value
 
 
 @lru_cache

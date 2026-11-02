@@ -92,6 +92,13 @@ def test_signature_is_enforced_when_secret_configured(publisher: FakePublisher, 
         assert len(publisher.events) == 1
 
 
+def test_blank_webhook_secret_disables_verification(publisher: FakePublisher, repo: FakeRepository) -> None:
+    # Render sets an optional variable left blank to "": that must mean "disabled", not "secret is empty".
+    assert Settings(webhook_secret="  ").webhook_secret is None  # type: ignore[arg-type]
+    for client in make_client(publisher, repo, webhook_secret=""):
+        assert client.post(URL, json=PAYLOAD).status_code == 202
+
+
 async def _seed(repo: FakeRepository) -> None:
     payload = WebhookPayload.model_validate({**PAYLOAD, "amount": "150.50", "currency": "USD"})
     await repo.insert_if_absent(
