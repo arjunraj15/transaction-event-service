@@ -1,0 +1,311 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 1140" width="1440" height="1140" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <title>Transaction Event Service: architecture infographic</title>
+  <defs>
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="1" stop-color="#1e3a8a"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+    </marker>
+    <marker id="arr-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#dc2626"/>
+    </marker>
+    <marker id="arr-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#059669"/>
+    </marker>
+    <marker id="arr-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0891b2"/>
+    </marker>
+  </defs>
+
+  <!-- Page -->
+  <rect width="1440" height="1140" fill="#f8fafc"/>
+
+  <!-- ============ HERO ============ -->
+  <rect width="1440" height="170" fill="url(#hero)"/>
+  <text x="60" y="74" font-size="34" font-weight="800" fill="#ffffff">Transaction Event Service</text>
+  <text x="60" y="106" font-size="16" fill="#cbd5e1">Acknowledge fast · process reliably · exactly-once effects</text>
+  <text x="60" y="136" font-size="13" fill="#94a3b8">Python 3.12 · FastAPI · Kafka · PostgreSQL · SQLAlchemy 2 · React + Vite · Docker · Render</text>
+
+  <g>
+    <rect x="758" y="40" width="150" height="90" rx="12" fill="#ffffff" fill-opacity="0.08" stroke="#ffffff" stroke-opacity="0.2"/>
+    <text x="833" y="80" text-anchor="middle" font-size="26" font-weight="800" fill="#60a5fa">&lt; 500 ms</text>
+    <text x="833" y="108" text-anchor="middle" font-size="12" fill="#cbd5e1">p95 webhook ack</text>
+
+    <rect x="922" y="40" width="150" height="90" rx="12" fill="#ffffff" fill-opacity="0.08" stroke="#ffffff" stroke-opacity="0.2"/>
+    <text x="997" y="80" text-anchor="middle" font-size="26" font-weight="800" fill="#4ade80">1×</text>
+    <text x="997" y="108" text-anchor="middle" font-size="12" fill="#cbd5e1">effect per transaction</text>
+
+    <rect x="1086" y="40" width="150" height="90" rx="12" fill="#ffffff" fill-opacity="0.08" stroke="#ffffff" stroke-opacity="0.2"/>
+    <text x="1161" y="80" text-anchor="middle" font-size="26" font-weight="800" fill="#fbbf24">6</text>
+    <text x="1161" y="108" text-anchor="middle" font-size="12" fill="#cbd5e1">Kafka partitions</text>
+
+    <rect x="1250" y="40" width="150" height="90" rx="12" fill="#ffffff" fill-opacity="0.08" stroke="#ffffff" stroke-opacity="0.2"/>
+    <text x="1325" y="80" text-anchor="middle" font-size="26" font-weight="800" fill="#c084fc">30 s</text>
+    <text x="1325" y="108" text-anchor="middle" font-size="12" fill="#cbd5e1">simulated processing</text>
+  </g>
+
+  <!-- ============ THE PIPELINE ============ -->
+  <text x="40" y="208" font-size="12" font-weight="700" letter-spacing="2" fill="#64748b">THE PIPELINE</text>
+  <line x1="150" y1="204" x2="1400" y2="204" stroke="#cbd5e1"/>
+
+  <!-- Card 1: Payment processor -->
+  <g>
+    <rect x="40" y="225" width="232" height="320" rx="14" fill="#ffffff" stroke="#cbd5e1" filter="url(#shadow)"/>
+    <path d="M40,239 a14,14 0 0 1 14,-14 h204 a14,14 0 0 1 14,14 v56 h-232 z" fill="#475569"/>
+    <circle cx="68" cy="260" r="16" fill="#ffffff"/>
+    <text x="68" y="266" text-anchor="middle" font-size="16" font-weight="800" fill="#475569">1</text>
+    <text x="94" y="257" font-size="16" font-weight="700" fill="#ffffff">Payment processor</text>
+    <text x="94" y="277" font-size="12" fill="#ffffff" fill-opacity="0.85">e.g. RazorPay</text>
+    <g font-size="12.5" fill="#1e293b">
+      <circle cx="60" cy="319" r="3" fill="#475569"/><text x="72" y="323">Sends POST /v1/webhooks/</text><text x="72" y="339">transactions</text>
+      <circle cx="60" cy="365" r="3" fill="#475569"/><text x="72" y="369">Signs raw body with</text><text x="72" y="385">HMAC-SHA256</text>
+      <circle cx="60" cy="411" r="3" fill="#475569"/><text x="72" y="415">Retries on 503 +</text><text x="72" y="431">Retry-After</text>
+      <circle cx="60" cy="457" r="3" fill="#475569"/><text x="72" y="461">The same event may</text><text x="72" y="477">arrive many times</text>
+    </g>
+    <rect x="54" y="503" width="204" height="28" rx="14" fill="#f1f5f9"/>
+    <text x="156" y="522" text-anchor="middle" font-size="12" font-weight="700" fill="#475569">At-least-once sender</text>
+  </g>
+
+  <!-- Card 2: API service -->
+  <g>
+    <rect x="322" y="225" width="232" height="320" rx="14" fill="#ffffff" stroke="#cbd5e1" filter="url(#shadow)"/>
+    <path d="M322,239 a14,14 0 0 1 14,-14 h204 a14,14 0 0 1 14,14 v56 h-232 z" fill="#2563eb"/>
+    <circle cx="350" cy="260" r="16" fill="#ffffff"/>
+    <text x="350" y="266" text-anchor="middle" font-size="16" font-weight="800" fill="#2563eb">2</text>
+    <text x="376" y="257" font-size="16" font-weight="700" fill="#ffffff">API service</text>
+    <text x="376" y="277" font-size="12" fill="#ffffff" fill-opacity="0.85">FastAPI · async I/O</text>
+    <g font-size="12.5" fill="#1e293b">
+      <circle cx="342" cy="319" r="3" fill="#2563eb"/><text x="354" y="323">Verify HMAC signature</text><text x="354" y="339">(constant-time compare)</text>
+      <circle cx="342" cy="365" r="3" fill="#2563eb"/><text x="354" y="369">Validate: Decimal amount,</text><text x="354" y="385">ISO-4217 currency</text>
+      <circle cx="342" cy="411" r="3" fill="#2563eb"/><text x="354" y="415">Publish key=transaction_id</text><text x="354" y="431">acks=all, idempotent</text>
+      <circle cx="342" cy="457" r="3" fill="#2563eb"/><text x="354" y="461">Broker ack ≤ 400 ms,</text><text x="354" y="477">else 503 + Retry-After</text>
+    </g>
+    <rect x="336" y="503" width="204" height="28" rx="14" fill="#dbeafe"/>
+    <text x="438" y="522" text-anchor="middle" font-size="12" font-weight="700" fill="#1d4ed8">202 Accepted in ms</text>
+  </g>
+
+  <!-- Card 3: Kafka -->
+  <g>
+    <rect x="604" y="225" width="232" height="320" rx="14" fill="#ffffff" stroke="#cbd5e1" filter="url(#shadow)"/>
+    <path d="M604,239 a14,14 0 0 1 14,-14 h204 a14,14 0 0 1 14,14 v56 h-232 z" fill="#d97706"/>
+    <circle cx="632" cy="260" r="16" fill="#ffffff"/>
+    <text x="632" y="266" text-anchor="middle" font-size="16" font-weight="800" fill="#d97706">3</text>
+    <text x="658" y="257" font-size="16" font-weight="700" fill="#ffffff">Kafka</text>
+    <text x="658" y="277" font-size="12" fill="#ffffff" fill-opacity="0.85">Confluent Cloud</text>
+    <g font-size="12.5" fill="#1e293b">
+      <circle cx="624" cy="319" r="3" fill="#d97706"/><text x="636" y="323">Topic</text><text x="636" y="339" font-family="Consolas, Menlo, monospace" font-size="12">transactions.received</text>
+      <circle cx="624" cy="365" r="3" fill="#d97706"/><text x="636" y="369">6 partitions, keyed by</text><text x="636" y="385">transaction_id</text>
+      <circle cx="624" cy="411" r="3" fill="#d97706"/><text x="636" y="415">Per-transaction ordering</text><text x="636" y="431">on a single consumer</text>
+      <circle cx="624" cy="457" r="3" fill="#d97706"/><text x="636" y="461">Durable, replayable</text><text x="636" y="477">buffer for bursts</text>
+    </g>
+    <rect x="618" y="503" width="204" height="28" rx="14" fill="#fef3c7"/>
+    <text x="720" y="522" text-anchor="middle" font-size="12" font-weight="700" fill="#b45309">Decouples ingest from work</text>
+  </g>
+
+  <!-- Card 4: Worker -->
+  <g>
+    <rect x="886" y="225" width="232" height="320" rx="14" fill="#ffffff" stroke="#cbd5e1" filter="url(#shadow)"/>
+    <path d="M886,239 a14,14 0 0 1 14,-14 h204 a14,14 0 0 1 14,14 v56 h-232 z" fill="#7c3aed"/>
+    <circle cx="914" cy="260" r="16" fill="#ffffff"/>
+    <text x="914" y="266" text-anchor="middle" font-size="16" font-weight="800" fill="#7c3aed">4</text>
+    <text x="940" y="257" font-size="16" font-weight="700" fill="#ffffff">Worker</text>
+    <text x="940" y="277" font-size="12" fill="#ffffff" fill-opacity="0.85">Separate process</text>
+    <g font-size="12.5" fill="#1e293b">
+      <circle cx="906" cy="319" r="3" fill="#7c3aed"/><text x="918" y="323"><tspan font-weight="700">Ingest:</tspan> INSERT …</text><text x="918" y="339">ON CONFLICT DO NOTHING</text>
+      <circle cx="906" cy="365" r="3" fill="#7c3aed"/><text x="918" y="369"><tspan font-weight="700">Complete:</tspan> wait until</text><text x="918" y="385">received_at + 30 s, UPDATE</text>
+      <circle cx="906" cy="411" r="3" fill="#7c3aed"/><text x="918" y="415">Commit the offset only</text><text x="918" y="431">after the DB commit</text>
+      <circle cx="906" cy="457" r="3" fill="#7c3aed"/><text x="918" y="461">Backpressure pauses</text><text x="918" y="477">busy partitions</text>
+    </g>
+    <rect x="900" y="503" width="204" height="28" rx="14" fill="#ede9fe"/>
+    <text x="1002" y="522" text-anchor="middle" font-size="12" font-weight="700" fill="#6d28d9">Idempotent processing</text>
+  </g>
+
+  <!-- Card 5: PostgreSQL -->
+  <g>
+    <rect x="1168" y="225" width="232" height="320" rx="14" fill="#ffffff" stroke="#cbd5e1" filter="url(#shadow)"/>
+    <path d="M1168,239 a14,14 0 0 1 14,-14 h204 a14,14 0 0 1 14,14 v56 h-232 z" fill="#059669"/>
+    <circle cx="1196" cy="260" r="16" fill="#ffffff"/>
+    <text x="1196" y="266" text-anchor="middle" font-size="16" font-weight="800" fill="#059669">5</text>
+    <text x="1222" y="257" font-size="16" font-weight="700" fill="#ffffff">PostgreSQL</text>
+    <text x="1222" y="277" font-size="12" fill="#ffffff" fill-opacity="0.85">Neon · source of truth</text>
+    <g font-size="12.5" fill="#1e293b">
+      <circle cx="1188" cy="319" r="3" fill="#059669"/><text x="1200" y="323">Primary key transaction_id</text><text x="1200" y="339">= idempotency guard</text>
+      <circle cx="1188" cy="365" r="3" fill="#059669"/><text x="1200" y="369">Money as NUMERIC(18,4),</text><text x="1200" y="385">never a float</text>
+      <circle cx="1188" cy="411" r="3" fill="#059669"/><text x="1200" y="415">Conditional transition</text><text x="1200" y="431">PROCESSING → PROCESSED</text>
+      <circle cx="1188" cy="457" r="3" fill="#059669"/><text x="1200" y="461">NOTIFY live events</text><text x="1200" y="477">for the dashboard</text>
+    </g>
+    <rect x="1182" y="503" width="204" height="28" rx="14" fill="#d1fae5"/>
+    <text x="1284" y="522" text-anchor="middle" font-size="12" font-weight="700" fill="#047857">Exactly-once effects</text>
+  </g>
+
+  <!-- Flow arrows between cards -->
+  <g font-size="11" font-weight="600" fill="#334155" text-anchor="middle">
+    <line x1="276" y1="330" x2="318" y2="330" stroke="#475569" stroke-width="2" marker-end="url(#arr)"/>
+    <text x="297" y="320">POST</text>
+    <line x1="318" y1="372" x2="276" y2="372" stroke="#475569" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+    <text x="297" y="390">202</text>
+
+    <line x1="558" y1="330" x2="600" y2="330" stroke="#475569" stroke-width="2" marker-end="url(#arr)"/>
+    <text x="579" y="320">produce</text>
+
+    <line x1="840" y1="330" x2="882" y2="330" stroke="#475569" stroke-width="2" marker-end="url(#arr)"/>
+    <text x="861" y="320">consume</text>
+
+    <line x1="1122" y1="330" x2="1164" y2="330" stroke="#475569" stroke-width="2" marker-end="url(#arr)"/>
+    <text x="1143" y="320">write</text>
+  </g>
+
+  <!-- ============ AROUND THE PIPELINE ============ -->
+  <text x="40" y="588" font-size="12" font-weight="700" letter-spacing="2" fill="#64748b">AROUND THE PIPELINE</text>
+  <line x1="215" y1="584" x2="1400" y2="584" stroke="#cbd5e1"/>
+
+  <!-- Connectors from cards into panels -->
+  <line x1="1002" y1="549" x2="1002" y2="596" stroke="#dc2626" stroke-width="2" marker-end="url(#arr-red)"/>
+  <line x1="1284" y1="549" x2="1284" y2="596" stroke="#059669" stroke-width="2" marker-end="url(#arr-green)"/>
+
+  <!-- Panel A: live dashboard -->
+  <g>
+    <rect x="40" y="600" width="514" height="175" rx="14" fill="#ffffff" stroke="#cbd5e1" filter="url(#shadow)"/>
+    <rect x="40" y="600" width="6" height="175" fill="#0891b2"/>
+    <text x="64" y="630" font-size="16" font-weight="700" fill="#0e7490">Live demo dashboard</text>
+    <text x="534" y="630" text-anchor="end" font-size="12" fill="#0891b2">React + Vite · static site</text>
+    <g font-size="11.5" font-weight="600" text-anchor="middle">
+      <rect x="64" y="648" width="100" height="32" rx="8" fill="#ecfeff" stroke="#67e8f9"/><text x="114" y="668" fill="#0e7490">Worker NOTIFY</text>
+      <line x1="168" y1="664" x2="190" y2="664" stroke="#0891b2" stroke-width="1.8" marker-end="url(#arr-cyan)"/>
+      <rect x="194" y="648" width="100" height="32" rx="8" fill="#ecfeff" stroke="#67e8f9"/><text x="244" y="668" fill="#0e7490">API LISTEN</text>
+      <line x1="298" y1="664" x2="320" y2="664" stroke="#0891b2" stroke-width="1.8" marker-end="url(#arr-cyan)"/>
+      <rect x="324" y="648" width="80" height="32" rx="8" fill="#ecfeff" stroke="#67e8f9"/><text x="364" y="668" fill="#0e7490">SSE</text>
+      <line x1="408" y1="664" x2="430" y2="664" stroke="#0891b2" stroke-width="1.8" marker-end="url(#arr-cyan)"/>
+      <rect x="434" y="648" width="100" height="32" rx="8" fill="#0891b2"/><text x="484" y="668" fill="#ffffff">Browser</text>
+    </g>
+    <g font-size="12.5" fill="#334155">
+      <text x="64" y="708">• Sends webhooks and shows each one move through the pipeline</text>
+      <text x="64" y="730">• Admin endpoints need X-Admin-Key; graded endpoints stay open</text>
+      <text x="64" y="752">• Events are informational only: no extra work on the webhook path</text>
+    </g>
+  </g>
+
+  <!-- Panel B: failure handling -->
+  <g>
+    <rect x="604" y="600" width="514" height="175" rx="14" fill="#ffffff" stroke="#cbd5e1" filter="url(#shadow)"/>
+    <rect x="604" y="600" width="6" height="175" fill="#dc2626"/>
+    <text x="628" y="630" font-size="16" font-weight="700" fill="#b91c1c">Failure handling</text>
+    <text x="1098" y="630" text-anchor="end" font-size="12" fill="#dc2626">retries with exponential backoff</text>
+    <g font-size="11.5" font-weight="600" text-anchor="middle">
+      <rect x="628" y="648" width="76" height="32" rx="8" fill="#fef2f2" stroke="#fca5a5"/><text x="666" y="668" fill="#b91c1c">Attempt 1</text>
+      <line x1="708" y1="664" x2="728" y2="664" stroke="#dc2626" stroke-width="1.8" marker-end="url(#arr-red)"/>
+      <rect x="732" y="648" width="76" height="32" rx="8" fill="#fef2f2" stroke="#fca5a5"/><text x="770" y="668" fill="#b91c1c">Attempt 2</text>
+      <line x1="812" y1="664" x2="832" y2="664" stroke="#dc2626" stroke-width="1.8" marker-end="url(#arr-red)"/>
+      <rect x="836" y="648" width="76" height="32" rx="8" fill="#fef2f2" stroke="#fca5a5"/><text x="874" y="668" fill="#b91c1c">Attempt 3</text>
+      <line x1="916" y1="664" x2="936" y2="664" stroke="#dc2626" stroke-width="1.8" marker-end="url(#arr-red)"/>
+      <rect x="940" y="648" width="158" height="32" rx="8" fill="#dc2626"/><text x="1019" y="668" fill="#ffffff" font-family="Consolas, Menlo, monospace">transactions.dlq</text>
+    </g>
+    <g font-size="12.5" fill="#334155">
+      <text x="628" y="708">• Business failure: 3 attempts, then DLQ (reason in a header), row FAILED</text>
+      <text x="628" y="730">• DB or broker down: retried indefinitely, never dead-lettered</text>
+      <text x="628" y="752">• Rebalance: in-flight work is not committed; the next owner redoes it</text>
+    </g>
+  </g>
+
+  <!-- Panel C: read path -->
+  <g>
+    <rect x="1168" y="600" width="232" height="175" rx="14" fill="#ffffff" stroke="#cbd5e1" filter="url(#shadow)"/>
+    <rect x="1168" y="600" width="6" height="175" fill="#059669"/>
+    <text x="1192" y="630" font-size="16" font-weight="700" fill="#047857">Read path</text>
+    <rect x="1192" y="645" width="190" height="30" rx="8" fill="#ecfdf5" stroke="#6ee7b7"/>
+    <text x="1287" y="664" text-anchor="middle" font-size="11" font-weight="600" fill="#047857" font-family="Consolas, Menlo, monospace">GET /v1/transactions/{id}</text>
+    <g font-size="12.5" fill="#334155">
+      <text x="1192" y="702">• API reads Postgres directly</text>
+      <text x="1192" y="724">• Kafka is not on the read path</text>
+      <text x="1192" y="746">• 404 for ~1 s until the</text>
+      <text x="1202" y="762">worker ingests the event</text>
+    </g>
+  </g>
+
+  <!-- ============ LIFECYCLE ============ -->
+  <text x="40" y="818" font-size="12" font-weight="700" letter-spacing="2" fill="#64748b">TRANSACTION LIFECYCLE</text>
+  <line x1="232" y1="814" x2="1400" y2="814" stroke="#cbd5e1"/>
+
+  <rect x="40" y="830" width="1360" height="130" rx="14" fill="#ffffff" stroke="#cbd5e1" filter="url(#shadow)"/>
+
+  <g font-size="14" font-weight="700" text-anchor="middle">
+    <rect x="80" y="855" width="200" height="40" rx="20" fill="#2563eb"/>
+    <text x="180" y="880" fill="#ffffff">202 Accepted</text>
+
+    <rect x="390" y="855" width="200" height="40" rx="20" fill="#e2e8f0"/>
+    <text x="490" y="880" fill="#475569">404 · not found yet</text>
+
+    <rect x="700" y="855" width="200" height="40" rx="20" fill="#f59e0b"/>
+    <text x="800" y="880" fill="#ffffff">PROCESSING</text>
+
+    <rect x="1020" y="842" width="200" height="40" rx="20" fill="#059669"/>
+    <text x="1120" y="867" fill="#ffffff">PROCESSED</text>
+
+    <rect x="1020" y="902" width="200" height="40" rx="20" fill="#dc2626"/>
+    <text x="1120" y="927" fill="#ffffff">FAILED</text>
+  </g>
+
+  <g fill="none" stroke-width="2">
+    <line x1="284" y1="875" x2="386" y2="875" stroke="#475569" marker-end="url(#arr)"/>
+    <line x1="594" y1="875" x2="696" y2="875" stroke="#475569" marker-end="url(#arr)"/>
+    <path d="M904,875 H935 C960,875 955,862 980,862 H1016" stroke="#059669" marker-end="url(#arr-green)"/>
+    <path d="M904,875 H935 C960,875 955,922 980,922 H1016" stroke="#dc2626" marker-end="url(#arr-red)"/>
+  </g>
+
+  <g font-size="11.5" fill="#64748b" text-anchor="middle">
+    <text x="335" y="866">event in Kafka</text>
+    <text x="645" y="866">ingested</text>
+    <text x="988" y="854">30 s</text>
+    <text x="988" y="944">3 attempts</text>
+    <text x="180" y="914">API has published the event</text>
+    <text x="490" y="914">Not ingested yet (~1 s)</text>
+    <text x="800" y="914">Row written, delay running</text>
+  </g>
+  <g font-size="12" fill="#64748b">
+    <text x="1236" y="867">Terminal · finalized</text>
+    <text x="1236" y="927">Terminal · event in DLQ</text>
+  </g>
+
+  <!-- ============ DEPLOYMENT ============ -->
+  <text x="40" y="998" font-size="12" font-weight="700" letter-spacing="2" fill="#64748b">DEPLOYMENT &amp; DELIVERY</text>
+  <line x1="240" y1="994" x2="1400" y2="994" stroke="#cbd5e1"/>
+
+  <g>
+    <rect x="40" y="1010" width="232" height="80" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
+    <rect x="40" y="1010" width="232" height="5" rx="2" fill="#6366f1"/>
+    <text x="58" y="1042" font-size="15" font-weight="700" fill="#0f172a">Render</text>
+    <text x="58" y="1064" font-size="12" fill="#475569">api · worker · dashboard</text>
+    <text x="58" y="1080" font-size="12" fill="#475569">one Docker image for both</text>
+
+    <rect x="322" y="1010" width="232" height="80" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
+    <rect x="322" y="1010" width="232" height="5" rx="2" fill="#d97706"/>
+    <text x="340" y="1042" font-size="15" font-weight="700" fill="#0f172a">Confluent Cloud</text>
+    <text x="340" y="1064" font-size="12" fill="#475569">Managed Kafka · SASL_SSL</text>
+    <text x="340" y="1080" font-size="12" fill="#475569">replication factor 3</text>
+
+    <rect x="604" y="1010" width="232" height="80" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
+    <rect x="604" y="1010" width="232" height="5" rx="2" fill="#059669"/>
+    <text x="622" y="1042" font-size="15" font-weight="700" fill="#0f172a">Neon</text>
+    <text x="622" y="1064" font-size="12" fill="#475569">Serverless PostgreSQL</text>
+    <text x="622" y="1080" font-size="12" fill="#475569">Alembic runs pre-deploy</text>
+
+    <rect x="886" y="1010" width="232" height="80" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
+    <rect x="886" y="1010" width="232" height="5" rx="2" fill="#0f172a"/>
+    <text x="904" y="1042" font-size="15" font-weight="700" fill="#0f172a">GitHub Actions</text>
+    <text x="904" y="1064" font-size="12" fill="#475569">ruff · mypy · unit + integration</text>
+    <text x="904" y="1080" font-size="12" fill="#475569">frontend build · Docker build</text>
+
+    <rect x="1168" y="1010" width="232" height="80" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
+    <rect x="1168" y="1010" width="232" height="5" rx="2" fill="#0891b2"/>
+    <text x="1186" y="1042" font-size="15" font-weight="700" fill="#0f172a">Observability</text>
+    <text x="1186" y="1064" font-size="12" fill="#475569">structlog JSON logs</text>
+    <text x="1186" y="1080" font-size="12" fill="#475569">Prometheus /metrics · health</text>
+  </g>
+
+  <text x="720" y="1122" text-anchor="middle" font-size="12" fill="#94a3b8">Delivered at least once, processed idempotently: exactly-once results</text>
+</svg>

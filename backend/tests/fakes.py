@@ -37,9 +37,17 @@ class FakeRepository:
     async def get(self, transaction_id: str) -> Transaction | None:
         return self.rows.get(transaction_id)
 
-    async def list_recent(self, limit: int, status: str | None = None) -> list[Transaction]:
-        rows = [r for r in self.rows.values() if status is None or r.status == status]
-        return sorted(rows, key=lambda r: r.created_at, reverse=True)[:limit]
+    async def list_recent(
+        self, limit: int, status: list[str] | None = None, offset: int = 0
+    ) -> list[Transaction]:
+        rows = [r for r in self.rows.values() if not status or r.status in status]
+        return sorted(rows, key=lambda r: r.created_at, reverse=True)[offset : offset + limit]
+
+    async def count_by_status(self) -> dict[str, int]:
+        counts: dict[str, int] = {}
+        for r in self.rows.values():
+            counts[str(r.status)] = counts.get(str(r.status), 0) + 1
+        return counts
 
     async def ping(self) -> bool:
         return self.healthy
